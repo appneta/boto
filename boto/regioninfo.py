@@ -39,6 +39,19 @@ def load_endpoint_json(path):
     with open(path, 'r') as endpoints_file:
         return json.load(endpoints_file)
 
+def load_module_json(path):
+    """
+    Loads a JSON file using the module __loader__
+
+    :param path: The path to the JSON file
+    :type path: string
+
+    :returns: The loaded data
+    """
+    if boto.__loader__:
+        return json.loads(boto.__loader__.get_data(path))
+    else:
+        return load_endpoint_json(path)
 
 def merge_endpoints(defaults, additions):
     """
@@ -80,7 +93,7 @@ def load_regions():
     :rtype: dict
     """
     # Load the defaults first.
-    endpoints = load_endpoint_json(boto.ENDPOINTS_PATH)
+    endpoints = load_module_json(boto.ENDPOINTS_PATH)
     additional_path = None
 
     # Try the ENV var. If not, check the config file.
